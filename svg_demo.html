@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript">
+function mult3D(p, v) {
+    return p[0]*v[0] + p[1]*v[1] + p[2]*v[2];
+}
+
+function open(w, h) {
+    document.write("<svg height=\""+h+"\" width=\""+w+"\">");
+}
+
+function polygon(p, sc, y0, v) {
+    document.write("  <polygon points=\"");
+    p.forEach(function(p) {
+        document.write(sc*mult3D(p[0],v),",",y0-sc*mult3D(p[1],v)," ");
+    });
+    document.write("    \" style=\"fill:white;stroke:black;stroke-width:1\">");
+    document.write("  </polygon>");
+}
+
+function polyline(p, sc, y0, v) {
+    document.write("  <polyline points=\"");
+    p.forEach(function(p) {
+        document.write(sc*mult3D(p[0],v),",",y0-sc*mult3D(p[1],v)," ");
+    });
+    document.write("    \" style=\"fill:white;stroke:lightgrey;stroke-width:1\">");
+    document.write("  </polyline>");
+}
+
+function close() {
+    document.write("</svg>");
+}
+
+var cuboid=[1,2,3];
+var p=[[[0,0,0],[0,0,0]], [[0,0,0],[0,1,0]], [[1,0,0],[0,1,0]], [[1,0,0],[1,2,0]], [[2,0,1],[1,2,0]], [[2,0,1],[1,1,0]], [[1,0,1],[1,1,0]], [[1,0,1], [0,0,0]]];
+var a=[[[1,0,0],[0,0,0]],[[1,0,0],[0,1,0]],[[1,0,1],[0,1,0]]];
+var b=[[[1,0,0],[1,1,0]],[[1,0,1],[1,1,0]],[[1,0,1],[1,2,0]]];
+
+open(400, 400);
+polygon(p, 80, 400, cuboid);
+polyline(a, 80, 400, cuboid);
+polyline(b, 80, 400, cuboid);
+close();
+</script>
+
+</head>
+<body>
+
+</body>
+</html>
