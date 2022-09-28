@@ -285,6 +285,10 @@ function show(s) {
      }
     close();
 
+    if (near(s,19)) { 
+        document.write('</td><td>');
+        document.write('<img src="cuboid.123.shortest_paths.png"></img>');
+    }
     document.write('</td></tr></table></body></html>');
 
     document.getElementById("s").focus();
