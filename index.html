@@ -244,7 +244,7 @@ fold.forEach(function(s) {
 
 var sc = 500/Math.max(max.x, max.y);
 
-function show(s) {
+function show(s, x, y, sel) {
     var mi={x:0,y:0};
     var ma={x:0,y:0};
     fold[s].p.forEach(function([x,y]) {
@@ -261,10 +261,14 @@ function show(s) {
              [0.6666,0.25,0],[0.6666,0.5,0],[0.6666,0.75,0]];
 
     document.open();
-    document.write('<html><body><input type="range" min="0" max="27" value="',
-                   s,'" id="s" onInput="javascript:doi()"><br>');
-    document.write('Cuboid folding ',s,';');
-    document.write(' shortest paths passing ', fold[s].f, ' cuboid faces.<br>');
+    document.write('<html><body>Cuboid folding ',s,":");
+    document.write('<input type="range" min="0" max="27" value="',
+                   s,'" id="s" onInput="javascript:doi(0)">');
+    document.write(' x:<input type="range" min="0.025" step="0.025" max="0.975" value="',
+                   x,'" id="x" onInput="javascript:doi(1)">');
+    document.write(' y:<input type="range" min="0.025" step="0.025" max="0.975" value="',
+                   y,'" id="y" onInput="javascript:doi(2)">');
+    document.write('<br>shortest paths passing ', fold[s].f, ' cuboid faces.<br>');
     document.write('<table border=1><tr><td>');
 
     open((max.x+0.4)*sc, (max.y+0.4)*sc);
@@ -279,26 +283,27 @@ function show(s) {
      });
 
      if (near(s,19)) {
-         polyline([[[0.2/cuboid[0],0,0],[0,1.45/cuboid[1],0]],
+         polyline([[[x,0,0],[0,y,0]],
                    add3D_(fold[s].q,fold[s].v,[0.9/cuboid[0],1.7/cuboid[1],0])],
                   sc, ox, oy, "yellow", cuboid);
      }
     close();
 
-    if (near(s,19)) { 
-        document.write('</td><td>');
-        document.write('<img src="cuboid.123.shortest_paths.png"></img>');
-    }
+    document.write('</td><td>');
+    document.write('<img src="cuboid.123.shortest_paths.png"></img>');
     document.write('</td></tr></table></body></html>');
 
-    document.getElementById("s").focus();
+    document.getElementById(["s","x","y"][sel]).focus();
 }
 
-function doi(s) {
-    show(document.getElementById("s").value);
+function doi(sel) {
+    show(document.getElementById("s").value,
+         document.getElementById("x").value,
+         document.getElementById("y").value,
+         sel);
 }
 
-show(19);
+show(19, 0.2/cuboid[0], 1.45/cuboid[1], 0);
 </script>
 
 </head>
