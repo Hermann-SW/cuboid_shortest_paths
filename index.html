@@ -244,7 +244,7 @@ fold.forEach(function(s) {
 
 var sc = 500/Math.max(max.x, max.y);
 
-function show(s, x, y, sel) {
+function show(s, x, y, n, sel) {
     var mi={x:0,y:0};
     var ma={x:0,y:0};
     fold[s].p.forEach(function([x,y]) {
@@ -256,9 +256,10 @@ function show(s, x, y, sel) {
     var ox=(0.2 - mi.x)*sc;
     var oy=(0.2 + ma.y)*sc;
 
-    var fs1=[[0.5,0.3333,0],[0.5,0.6666,0]];
-    var fs2=[[0.3333,0.25,0],[0.3333,0.5,0],[0.3333,0.75,0],
-             [0.6666,0.25,0],[0.6666,0.5,0],[0.6666,0.75,0]];
+    var fs=[];
+    for(i=1; i<n; ++i)
+        for(j=1; j<n; ++j)
+            fs.push([i/n,j/n,0]);
 
     document.open();
     document.write('<html><body>Cuboid folding ',s,":");
@@ -268,42 +269,44 @@ function show(s, x, y, sel) {
                    x,'" id="x" onInput="javascript:doi(1)">');
     document.write(' y:<input type="range" min="0.025" step="0.025" max="0.975" value="',
                    y,'" id="y" onInput="javascript:doi(2)">');
-    document.write('<br>shortest paths passing ', fold[s].f, ' cuboid faces.<br>');
+    document.write(' n=', n, ':');
+    document.write('<input type="range" min="0" max="100" value="',
+                   n,'" id="n" onInput="javascript:doi(3)">');
+
+    document.write(' X=1 Y=2 Z=3<br>');
+    document.write('shortest paths passing ', fold[s].f, ' cuboid faces.<br>');
     document.write('<table border=1><tr><td>');
 
     open((max.x+0.4)*sc, (max.y+0.4)*sc);
      polygon(fold[s].p, sc, ox, oy, cuboid);
      circle([[0,0,0],[0,0,0]], sc, ox, oy, 0.1, true, cuboid); 
-     fs1.forEach(function(f) {
-         circle([cross3D([1,0,0],f),cross3D([0,1,0],f)], sc, ox, oy, 0.05, true, cuboid); 
-     });
+     var f=[x,y,0];
+     circle([cross3D([1,0,0],f),cross3D([0,1,0],f)], sc, ox, oy, 0.05, true, cuboid); 
      circle(fold[s].q, sc, ox, oy, 0.1, false, cuboid); 
-     fs2.forEach(function(f) {
-         circle(add3D_(fold[s].q,fold[s].v,f), sc, ox, oy, 0.05, false, cuboid);
-     });
 
-     if (near(s,19)) {
+     var col=["orange","blue","yellow","red"][fold[s].f-3];
+     fs.forEach(function(f) {
          polyline([[[x,0,0],[0,y,0]],
-                   add3D_(fold[s].q,fold[s].v,[0.9/cuboid[0],1.7/cuboid[1],0])],
-                  sc, ox, oy, "yellow", cuboid);
-     }
+                  add3D_(fold[s].q,fold[s].v,f)], sc, ox, oy, col, cuboid);
+     });
     close();
 
     document.write('</td><td>');
     document.write('<img src="cuboid.123.shortest_paths.png"></img>');
     document.write('</td></tr></table></body></html>');
 
-    document.getElementById(["s","x","y"][sel]).focus();
+    document.getElementById(["s","x","y","n"][sel]).focus();
 }
 
 function doi(sel) {
     show(document.getElementById("s").value,
          document.getElementById("x").value,
          document.getElementById("y").value,
+         document.getElementById("n").value,
          sel);
 }
 
-show(19, 0.2/cuboid[0], 1.45/cuboid[1], 0);
+show(19, 0.2/cuboid[0], 1.45/cuboid[1], 5, 0);
 </script>
 
 </head>
