@@ -59,7 +59,12 @@ function close() {
 }
 
 
-var cuboid=[1,2,3];
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+var cuboid=[1,urlParams.get("Y"),urlParams.get("Z")];
+if (cuboid[1]===null)  cuboid[1] = 2;
+if (cuboid[2]===null)  cuboid[2] = 3;
 
 var fold=[
 {p:[[[0,0,0],[0,0,0]], [[0,0,0],[0,1,0]], [[1,0,0],[0,1,0]], [[1,0,0],[2,2,0]],
@@ -244,7 +249,42 @@ fold.forEach(function(s) {
 
 var sc = 500/Math.max(max.x, max.y);
 
+var M;
+
+function compute(x,y,n) {
+    var ma2 = max.x*max.x + max.y*max.y;
+
+    M = new Array(n);
+
+    for (j=1; j<n; j++) {
+        M[j] = new Array(n);
+        for (k=1; k<n; k++) {
+            M[j][k] = [ma2,-1];
+        }
+    }
+
+    for(s=0; s<fold.length; ++s) {
+        for (j=1; j<n; j++) {
+            for (k=1; k<n; k++) {
+                var XY = add3D_(fold[s].q,fold[s].v,[j/n,k/n,0]);
+                var X = mult3D(XY[0], cuboid);
+                var Y = mult3D(XY[1], cuboid);
+                var v = (x*cuboid[0]-X)*(x*cuboid[0]-X) + (y*cuboid[1]-Y)*(y*cuboid[1]-Y);
+                if (M[j][k][0] > v) {
+                    M[j][k] = [v, s];
+                }
+            }
+        }
+    }
+}
+
 function show(s, x, y, n, sel) {
+    if (sel !== 0) {
+        compute(x,y,n);
+    }
+    if (sel < 0) {
+        sel = 0;
+    }
     var mi={x:0,y:0};
     var ma={x:0,y:0};
     fold[s].p.forEach(function([x,y]) {
@@ -274,10 +314,11 @@ function show(s, x, y, n, sel) {
                    y,'" id="y" onInput="javascript:doi(2)">');
     document.write(' n=', n);
     document.write('<input type="range" min="0" max="100" value="',
-                   n,'" id="n" onInput="javascript:doi(3)">');
+                   n,'" id="n" onInput="javascript:doi(3)"><br>');
 
-    document.write(' X=1 Y=2 Z=3<br>');
-    document.write('shortest paths passing ', fold[s].f, ' cuboid faces.<br>');
+    document.write(' X=1 Y=',cuboid[1],' Z=',cuboid[2],'; ');
+    document.write('shortest paths passing ', fold[s].f, ' cuboid faces. ');
+    document.write('<input type="button" value=" Share " onclick="share()"<br>');
     document.write('<table border=1><tr><td>');
 
     open((max.x+0.4)*sc, (max.y+0.4)*sc);
@@ -288,14 +329,21 @@ function show(s, x, y, n, sel) {
      circle(fold[s].q, sc, ox, oy, 0.05, false, cuboid); 
 
      var col=["orange","blue","yellow","red"][fold[s].f-3];
-     fs.forEach(function(f) {
-         polyline([[[x,0,0],[0,y,0]],
-                  add3D_(fold[s].q,fold[s].v,f)], sc, ox, oy, col, cuboid);
-     });
+     for (j=1; j<n; j++) {
+         for (k=1; k<n; k++) {
+//             console.log(j,k,M[j][k][0],M[j][k][1],near(M[j][k][1],s));
+             if (near(M[j][k][1], s)) {
+                 polyline([[[x,0,0],[0,y,0]],
+                          add3D_(fold[s].q,fold[s].v,[j/n,k/n,0])], sc, ox, oy, col, cuboid);
+             }
+         }
+     }
     close();
 
-    document.write('</td><td>');
-    document.write('<img src="cuboid.123.shortest_paths.png"></img>');
+    if (near(x,0.2/cuboid[0]) && near(y,1.45/cuboid[1]) &&
+        near(cuboid[1], 2) && near(cuboid[2], 3)) {
+        document.write('</td><td><img src="cuboid.123.shortest_paths.png"></img>');
+    }
     document.write('</td></tr></table></body></html>');
 
     document.getElementById(["s","x","y","n"][sel]).focus();
@@ -309,7 +357,23 @@ function doi(sel) {
          sel);
 }
 
-show(19, 0.2/cuboid[0], 1.45/cuboid[1], 5, 0);
+function share() {
+    window.location.search = ( 
+        "s="+document.getElementById("s").value +
+        "&x="+document.getElementById("x").value +
+        "&y="+document.getElementById("y").value +
+        "&n="+document.getElementById("n").value +
+        "&Y="+cuboid[1] +
+        "&Z="+cuboid[2]
+    );
+}
+
+var params=[urlParams.get("s"),urlParams.get("x"),urlParams.get("y"),urlParams.get("n")];
+if (params[0]===null)  params[0] = 19;
+if (params[1]===null)  params[1] = 0.2/cuboid[0];
+if (params[2]===null)  params[2] = Math.min(1.45/cuboid[1], 1);
+if (params[3]===null)  params[3] = 20;
+show(params[0], params[1], params[2], params[3], -1);
 </script>
 
 </head>
