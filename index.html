@@ -261,15 +261,18 @@ function show(s, x, y, n, sel) {
         for(j=1; j<n; ++j)
             fs.push([i/n,j/n,0]);
 
+    var x3=parseFloat(x).toFixed(3);
+    var y3=parseFloat(y).toFixed(3);
+
     document.open();
-    document.write('<html><body>Cuboid folding ',s,":");
+    document.write('<html><body>Cuboid folding ',s);
     document.write('<input type="range" min="0" max="27" value="',
                    s,'" id="s" onInput="javascript:doi(0)">');
-    document.write(' x:<input type="range" min="0.025" step="0.025" max="0.975" value="',
+    document.write(' x=',x3,'<input type="range" min="0.025" step="0.025" max="0.975" value="',
                    x,'" id="x" onInput="javascript:doi(1)">');
-    document.write(' y:<input type="range" min="0.025" step="0.025" max="0.975" value="',
+    document.write(' y=',y3,'<input type="range" min="0.025" step="0.025" max="0.975" value="',
                    y,'" id="y" onInput="javascript:doi(2)">');
-    document.write(' n=', n, ':');
+    document.write(' n=', n);
     document.write('<input type="range" min="0" max="100" value="',
                    n,'" id="n" onInput="javascript:doi(3)">');
 
@@ -279,10 +282,10 @@ function show(s, x, y, n, sel) {
 
     open((max.x+0.4)*sc, (max.y+0.4)*sc);
      polygon(fold[s].p, sc, ox, oy, cuboid);
-     circle([[0,0,0],[0,0,0]], sc, ox, oy, 0.1, true, cuboid); 
+     circle([[0,0,0],[0,0,0]], sc, ox, oy, 0.05, true, cuboid); 
      var f=[x,y,0];
      circle([cross3D([1,0,0],f),cross3D([0,1,0],f)], sc, ox, oy, 0.05, true, cuboid); 
-     circle(fold[s].q, sc, ox, oy, 0.1, false, cuboid); 
+     circle(fold[s].q, sc, ox, oy, 0.05, false, cuboid); 
 
      var col=["orange","blue","yellow","red"][fold[s].f-3];
      fs.forEach(function(f) {
