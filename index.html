@@ -279,11 +279,58 @@ function compute(x,y,n) {
 }
 
 function show(s, x, y, n, sel) {
+    if (typeof(s) === 'string')  s = parseInt(s);
+
+    if (sel === 4) {
+        var found;
+        for(s=(s>0)?s-1:0; s>0; s--) {
+            found = false;
+            for (j=1; j<n; j++) {
+                for (k=1; k<n; k++) {
+                    found = found || near(M[j][k][1], s);
+                }
+            }
+            if (found)  break;
+        } 
+        if (!found) {
+            for(s=0; s<fold.length-1; s++) {
+                var found = false;
+                for (j=1; j<n; j++) {
+                    for (k=1; k<n; k++) {
+                        found = found || near(M[j][k][1], s);
+                    }
+                }
+                if (found)  break;
+            } 
+        }
+        sel = 0;
+    }
+    if (sel === 5) {
+        for(s=(s<fold.length-1)?s+1:fold.length-1; s<fold.length-1; s++) {
+           var found = false;
+           for (j=1; j<n; j++) {
+               for (k=1; k<n; k++) {
+                   found = found || near(M[j][k][1], s);
+               }
+           }
+           if (found)  break;
+        } 
+        if (!found) {
+            for(s=fold.length-1; s>0; s--) {
+                var found = false;
+                for (j=1; j<n; j++) {
+                    for (k=1; k<n; k++) {
+                        found = found || near(M[j][k][1], s);
+                    }
+                }
+                if (found)  break;
+            } 
+        }
+        sel = 0;
+    }
     if (sel !== 0) {
         compute(x,y,n);
-    }
-    if (sel < 0) {
-        sel = 0;
+        if (sel < 0)  sel = 0;
     }
     var mi={x:0,y:0};
     var ma={x:0,y:0};
@@ -305,9 +352,11 @@ function show(s, x, y, n, sel) {
     var y3=parseFloat(y).toFixed(3);
 
     document.open();
-    document.write('<html><body>Cuboid folding ',s);
+    document.write('<html><body>Cuboid folding ',("0"+s).slice(-2),' ');
+    document.write('<input type="button" value="&laquo;" onclick="doi(4)">');
     document.write('<input type="range" min="0" max="27" value="',
                    s,'" id="s" onInput="javascript:doi(0)">');
+    document.write('<input type="button" value="&raquo;" onclick="doi(5)">');
     document.write(' x=',x3,'<input type="range" min="0.025" step="0.025" max="0.975" value="',
                    x,'" id="x" onInput="javascript:doi(1)">');
     document.write(' y=',y3,'<input type="range" min="0.025" step="0.025" max="0.975" value="',
@@ -346,7 +395,7 @@ function show(s, x, y, n, sel) {
     }
     document.write('</td></tr></table></body></html>');
 
-    document.getElementById(["s","x","y","n"][sel]).focus();
+    document.getElementById(["s","x","y","n","s","s"][sel]).focus();
 }
 
 function doi(sel) {
