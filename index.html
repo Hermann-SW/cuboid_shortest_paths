@@ -233,6 +233,8 @@ var fold=[
 },
 ];
 
+var P = [[[0,0,0],[0,0,0]], [[0,0,0],[0,2,0]], [[2,0,0],[0,2,0]], [[2,0,0],[0,0,0]]];
+
 var max={x:0,y:0};
 fold.forEach(function(s) {
     var mi={x:0,y:0};
@@ -355,6 +357,31 @@ function show(s, x, y, n, sel) {
          }
      }
     close();
+
+    document.write('</td><td valign=top><table border=0><tr height=',(cuboid[1])*2*sc+4,'><td>');
+
+    open((cuboid[0])*2*sc+2, (cuboid[1])*2*sc+2);
+     polygon(P, sc, 1, cuboid[1]*2*sc+1, cuboid);
+     circle([[0,0,0],[0,0,0]], 2*sc, 1, cuboid[1]*2*sc+1, 0.05, false, cuboid);
+    close();
+    document.write('</td></tr><tr><td align=center>top face</td></tr></table>');
+    document.write('</td><td valign=top><table border=0><tr height=',(cuboid[1])*2*sc+4,'><td>');
+    open((cuboid[0])*2*sc+2, (cuboid[1])*2*sc+2);
+     polygon(P, sc, 1, cuboid[1]*2*sc+1, cuboid);
+     circle([[0,0,0],[0,0,0]], 2*sc, 1, cuboid[1]*2*sc+1, 0.05, true, cuboid);
+     for (j=1; j<n; j++) {
+         for (k=1; k<n; k++) {
+           for(s=0; s<fold.length; s++) {
+             if (near(M[j][k][1], s)) {
+                 var col=["orange","blue","yellow","red"][fold[s].f-3];
+                 polyline([[[x,0,0],[0,y,0]],
+                          add3D_(fold[s].q,fold[s].v,[j/n,k/n,0])], 2*sc, 1, cuboid[1]*2*sc+1, col, cuboid);
+             }
+           }
+         }
+     }
+    close();
+    document.write('</td></tr><tr><td align=center>bottom face</td></tr></table>');
 
     if (near(x,0.2/cuboid[0]) && near(y,1.45/cuboid[1]) &&
         near(cuboid[1], 2) && near(cuboid[2], 3)) {
