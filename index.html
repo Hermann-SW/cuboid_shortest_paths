@@ -256,11 +256,21 @@ fold.forEach(function(s) {
 var sc = L/Math.max(max.x, max.y);
 
 var M;
+var Q;
+var T;
 
 function compute(x,y,n) {
     var ma2 = max.x*max.x + max.y*max.y;
 
     M = new Array(n);
+    T = new Array(fold.length);
+    Q = new Array(fold.length);
+    for (s=0; s<fold.length; s++) {
+        Q[s] = new Array(n);
+        for (j=1; j<n; j++) {
+            Q[s][j] = new Array(n);
+        }
+    }
 
     for (j=1; j<n; j++) {
         M[j] = new Array(n);
@@ -270,9 +280,23 @@ function compute(x,y,n) {
     }
 
     for(s=0; s<fold.length; ++s) {
+        var t = add3D_(fold[s].q,fold[s].v,[0,0,0]);
+        t = [x-mult3D(t[0],cuboid), y-mult3D(t[1],cuboid)];
+        var v = [fold[s].v[0], fold[s].v[1]];
+        if (v[0][0] === 0) {
+            t = [t[1], t[0]];
+            t[0]*=v[1][0];
+            t[1]*=v[0][1];
+        } else {
+            t[0]*=v[0][0];
+            t[1]*=v[1][1];
+        }
+        T[s] = [[t[0],0,0],[0,t[1],0]];
+
         for (j=1; j<n; j++) {
             for (k=1; k<n; k++) {
                 var XY = add3D_(fold[s].q,fold[s].v,[j/n,k/n,0]);
+                Q[s][j][k] = XY;
                 var X = mult3D(XY[0], cuboid);
                 var Y = mult3D(XY[1], cuboid);
                 var v = (x*cuboid[0]-X)*(x*cuboid[0]-X) + (y*cuboid[1]-Y)*(y*cuboid[1]-Y);
@@ -339,6 +363,7 @@ function show(s, x, y, n, sel) {
                    n,'" id="n" onInput="javascript:doi(3)"><br>');
 
     document.write(' X=1 Y=',cuboid[1],' Z=',cuboid[2],'; ');
+    document.write('L=',L,'; ');
     document.write('shortest paths passing ', fold[s].f, ' cuboid faces. ');
     document.write('<input type="button" value=" Share " onclick="share()"<br>');
     document.write('<table border=1><tr><td>');
@@ -353,10 +378,9 @@ function show(s, x, y, n, sel) {
      var col=["orange","blue","yellow","red"][fold[s].f-3];
      for (j=1; j<n; j++) {
          for (k=1; k<n; k++) {
-//             console.log(j,k,M[j][k][0],M[j][k][1],near(M[j][k][1],s));
              if (near(M[j][k][1], s)) {
-                 polyline([[[x,0,0],[0,y,0]],
-                          add3D_(fold[s].q,fold[s].v,[j/n,k/n,0])], sc, ox, oy, col, cuboid);
+                 polyline([[[x,0,0],[0,y,0]], Q[s][j][k]],
+                          sc, ox, oy, col, cuboid);
              }
          }
      }
@@ -367,6 +391,18 @@ function show(s, x, y, n, sel) {
     open((cuboid[0])*2*sc+2, (cuboid[1])*2*sc+2);
      polygon(P, sc, 1, cuboid[1]*2*sc+1, cuboid);
      circle([[0,0,0],[0,0,0]], 2*sc, 1, cuboid[1]*2*sc+1, 0.05, false, cuboid);
+     for (j=1; j<n; j++) {
+         for (k=1; k<n; k++) {
+           for(s=0; s<fold.length; s++) {
+             if (near(M[j][k][1], s)) {
+                 var u = Q[s][j][k];
+                 var col=["orange","blue","yellow","red"][fold[s].f-3];
+                 polyline([T[s], [[j/n,0,0],[0,k/n,0]]],
+                          2*sc, 1, cuboid[1]*2*sc+1, col, cuboid);
+             }
+           }
+         }
+     }
     close();
     document.write('</td></tr><tr><td align=center>top face</td></tr></table>');
     document.write('</td><td valign=top><table border=0><tr height=',(cuboid[1])*2*sc+4,'><td>');
@@ -378,8 +414,8 @@ function show(s, x, y, n, sel) {
            for(s=0; s<fold.length; s++) {
              if (near(M[j][k][1], s)) {
                  var col=["orange","blue","yellow","red"][fold[s].f-3];
-                 polyline([[[x,0,0],[0,y,0]],
-                          add3D_(fold[s].q,fold[s].v,[j/n,k/n,0])], 2*sc, 1, cuboid[1]*2*sc+1, col, cuboid);
+                 polyline([[[x,0,0],[0,y,0]], Q[s][j][k]],
+                          2*sc, 1, cuboid[1]*2*sc+1, col, cuboid);
              }
            }
          }
