@@ -281,51 +281,18 @@ function compute(x,y,n) {
 function show(s, x, y, n, sel) {
     if (typeof(s) === 'string')  s = parseInt(s);
 
-    if (sel === 4) {
-        var found;
-        for(s=(s>0)?s-1:0; s>0; s--) {
-            found = false;
+    if ((sel === 4) || (sel === 5)) {
+        var dir = (sel === 4) ? fold.length-1 : 1;
+        for(s=(s+dir)%fold.length; ; s=(s+dir)%fold.length) {
+            var found = false;
             for (j=1; j<n; j++) {
                 for (k=1; k<n; k++) {
                     found = found || near(M[j][k][1], s);
                 }
             }
             if (found)  break;
+            if (s===0)  s=fold.length;
         } 
-        if (!found) {
-            for(s=0; s<fold.length-1; s++) {
-                var found = false;
-                for (j=1; j<n; j++) {
-                    for (k=1; k<n; k++) {
-                        found = found || near(M[j][k][1], s);
-                    }
-                }
-                if (found)  break;
-            } 
-        }
-        sel = 0;
-    }
-    if (sel === 5) {
-        for(s=(s<fold.length-1)?s+1:fold.length-1; s<fold.length-1; s++) {
-           var found = false;
-           for (j=1; j<n; j++) {
-               for (k=1; k<n; k++) {
-                   found = found || near(M[j][k][1], s);
-               }
-           }
-           if (found)  break;
-        } 
-        if (!found) {
-            for(s=fold.length-1; s>0; s--) {
-                var found = false;
-                for (j=1; j<n; j++) {
-                    for (k=1; k<n; k++) {
-                        found = found || near(M[j][k][1], s);
-                    }
-                }
-                if (found)  break;
-            } 
-        }
         sel = 0;
     }
     if (sel !== 0) {
@@ -391,7 +358,7 @@ function show(s, x, y, n, sel) {
 
     if (near(x,0.2/cuboid[0]) && near(y,1.45/cuboid[1]) &&
         near(cuboid[1], 2) && near(cuboid[2], 3)) {
-        document.write('</td><td><img src="cuboid.123.shortest_paths.png"></img>');
+        document.write('</td><td><img src="cuboid.123.shortest_paths.small.png"></img>');
     }
     document.write('</td></tr></table></body></html>');
 
