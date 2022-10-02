@@ -66,6 +66,9 @@ var cuboid=[1,urlParams.get("Y"),urlParams.get("Z")];
 if (cuboid[1]===null)  cuboid[1] = 2;
 if (cuboid[2]===null)  cuboid[2] = 3;
 
+var L = urlParams.get("L");
+if (L===null)  L = 500;
+
 var fold=[
 {p:[[[0,0,0],[0,0,0]], [[0,0,0],[0,1,0]], [[1,0,0],[0,1,0]], [[1,0,0],[2,2,0]],
    [[1,1,1],[2,2,0]], [[1,1,1],[1,2,0]], [[1,0,1],[1,2,0]], [[1,0,1], [0,0,0]]],
@@ -249,7 +252,8 @@ fold.forEach(function(s) {
     max.y = Math.max(max.y, ma.y-mi.y); 
 });
 
-var sc = 500/Math.max(max.x, max.y);
+
+var sc = L/Math.max(max.x, max.y);
 
 var M;
 
@@ -407,7 +411,8 @@ function share() {
         "&y="+document.getElementById("y").value +
         "&n="+document.getElementById("n").value +
         "&Y="+cuboid[1] +
-        "&Z="+cuboid[2]
+        "&Z="+cuboid[2] +
+        "&L="+L
     );
 }
 
